@@ -1,5 +1,0 @@
-k3s_version: ""
-k3s_disable:
-  - traefik
-
-k3s_write_kubeconfig_mode: "644"

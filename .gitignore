@@ -17,3 +17,6 @@ venv/
 commands.txt
 README copy*
 terraform.tfvars
+global-bundle*
+terraform.tfstate 
+terraform.tfstate.backup

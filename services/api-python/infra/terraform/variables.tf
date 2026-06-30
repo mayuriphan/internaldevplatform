@@ -12,13 +12,13 @@ variable "instance_type" {
 }
 
 variable "key_name" {
-  default = var.key_name
+  type    = string
 }
 
 variable "ip" {
-  default = var.ip
+  type    = string
 }
 
 variable "ami" {
-  default = var.ami
+  type    = string
 }
