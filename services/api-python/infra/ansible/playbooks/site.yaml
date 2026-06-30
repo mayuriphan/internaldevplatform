@@ -1,4 +1,4 @@
 ---
-- import_playbook: bootstrap.yml
-- import_playbook: cluster.yml
-- import_playbook: platform.yml
+- import_playbook: bootstrap.yaml
+- import_playbook: cluster.yaml
+- import_playbook: platform.yaml

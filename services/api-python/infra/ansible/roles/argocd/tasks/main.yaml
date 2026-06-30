@@ -3,6 +3,7 @@
   kubernetes.core.helm_repository:
     name: argo
     repo_url: https://argoproj.github.io/argo-helm
+    kubeconfig: "{{ kubeconfig_path }}"
 
 - name: Install Argo CD
   kubernetes.core.helm:
@@ -11,3 +12,4 @@
     release_namespace: argocd
     create_namespace: true
     wait: true
+    kubeconfig: "{{ kubeconfig_path }}"

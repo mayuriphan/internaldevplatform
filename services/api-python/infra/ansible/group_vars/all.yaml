@@ -1,0 +1,7 @@
+---
+kubeconfig_path: /etc/rancher/k3s/k3s.yaml
+k3s_version: "v1.33.1+k3s1"
+k3s_write_kubeconfig_mode: "644"
+
+k3s_disable:
+  - traefik
