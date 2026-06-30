@@ -1,0 +1,37 @@
+name: IDP CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1
+
+      - name: Login to ECR
+        run: |
+          aws ecr get-login-password | docker login --username AWS --password-stdin $ECR_REGISTRY
+
+      - name: Build API Image
+        run: |
+          docker build -t idp-api ./services/api-python -f infra/docker/api.Dockerfile
+
+      - name: Build Worker Image
+        run: |
+          docker build -t idp-worker ./services/worker-python -f infra/docker/worker.Dockerfile
+
+      - name: Push Images
+        run: |
+          docker push idp-api:latest
+          docker push idp-worker:latest

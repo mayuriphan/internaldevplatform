@@ -1,0 +1,43 @@
+---
+- name: Check k3s exists
+  stat:
+    path: /usr/local/bin/k3s
+  register: k3s_bin
+
+- name: Install k3s
+  shell: >
+    curl -sfL https://get.k3s.io |
+    INSTALL_K3S_VERSION={{ k3s_version }}
+    sh -s -
+    --write-kubeconfig-mode={{ k3s_write_kubeconfig_mode }}
+    {{ k3s_disable | map('regex_replace', '^(.*)$', '--disable \\1') | join(' ') }}
+  when: not k3s_bin.stat.exists
+
+- name: Wait for node Ready
+  command: kubectl get nodes
+  register: nodes
+  retries: 20
+  delay: 10
+  until: nodes.rc == 0
+
+- name: Create kube config dir
+  file:
+    path: /home/ubuntu/.kube
+    state: directory
+    owner: ubuntu
+    group: ubuntu
+
+- name: Copy kubeconfig
+  copy:
+    remote_src: true
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: /home/ubuntu/.kube/config
+    owner: ubuntu
+    group: ubuntu
+    mode: "0600"
+
+- name: Fix kubeconfig server IP
+  replace:
+    path: /home/ubuntu/.kube/config
+    regexp: "127.0.0.1"
+    replace: "{{ ansible_host }}"

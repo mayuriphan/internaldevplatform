@@ -1,0 +1,21 @@
+---
+- name: Update apt cache
+  apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Upgrade packages
+  apt:
+    upgrade: dist
+
+- name: Install required packages
+  apt:
+    name:
+      - curl
+      - git
+      - unzip
+      - jq
+      - python3-pip
+      - ca-certificates
+      - apt-transport-https
+    state: present

@@ -1,0 +1,2 @@
+class IdpException(Exception):
+    pass

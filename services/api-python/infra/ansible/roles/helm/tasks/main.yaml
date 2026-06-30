@@ -1,0 +1,12 @@
+---
+- name: Check if Helm exists
+  stat:
+    path: /usr/local/bin/helm
+  register: helm_binary
+
+- name: Install Helm
+  shell: curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+  when: not helm_binary.stat.exists
+
+- name: Verify Helm
+  command: helm version
