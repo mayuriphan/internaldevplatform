@@ -72,6 +72,7 @@ InternalDeveloperPlatformOROpenServiceBroker
       │  │  ├─ configmap.yaml
       │  │  ├─ hpa.yaml
       │  │  ├─ ingres.yaml
+            ├─ argocd-ingres.yaml
       │  │  ├─ monitoring
       │  │  │  ├─ grafana.yaml
       │  │  │  └─ prometheus.yaml

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
-from app.api.deps.db import get_db
+from app.db.database import get_db
 from app.repositories.job_repository import JobRepository
-from app.schemas.job import JobResponse
+from app.schemas.jobs import JobResponse
 
 router = APIRouter()
 

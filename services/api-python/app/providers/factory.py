@@ -1,5 +1,5 @@
 from app.providers.aws_provider import AWSProvider
-from app.providers.k8s_provider import KubernetesProvider
+from app.providers.k8_provider import KubernetesProvider
 from app.providers.postgres_provider import PostgresProvider
 
 
