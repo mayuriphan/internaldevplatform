@@ -2,10 +2,10 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-COPY requirements.txt .
+COPY services/worker-python/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY worker ./worker
-COPY app ./app
+COPY services/worker-python .
+COPY services/api-python/app ./app
 
 CMD ["python", "-m", "worker.main"]

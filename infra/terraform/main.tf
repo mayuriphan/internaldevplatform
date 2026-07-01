@@ -2,13 +2,6 @@ module "vpc" {
   source = "./vpc"
 }
 
-# module "eks" {
-#   source = "./eks"
-
-#   vpc_id     = module.vpc.vpc_id
-#   subnet_ids = module.vpc.private_subnets
-# }
-
 module "rds" {
   source = "./rds"
 
@@ -83,3 +76,16 @@ resource "aws_instance" "k3s" {
     Name = "k3s-server"
   }
 }
+
+module "iam" {
+  source = "./iam"
+  github_owner = var.github_owner
+  github_repo  = var.github_repo
+}
+
+# module "eks" {
+#   source = "./eks"
+
+#   vpc_id     = module.vpc.vpc_id
+#   subnet_ids = module.vpc.private_subnets
+# }

@@ -1,7 +1,7 @@
 import json
 import time
 
-from app.jobs.executor import JobExecutor
+from jobs.executer import JobExecutor
 from app.providers.factory import ProviderFactory
 from app.repositories.job_repository import JobRepository
 from app.db.database import db_manager
