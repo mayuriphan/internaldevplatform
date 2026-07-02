@@ -3,7 +3,9 @@ name: Build, Push & Deploy
 on:
   push:
     branches:
-      - main
+      - master
+
+  workflow_dispatch:
 
 concurrency:
   group: production-deploy
