@@ -148,7 +148,7 @@ jobs:
         run: |
 
           git clone \
-          https://x-access-token:${{ secrets.GITOPS_PAT }}@github.com/${{ vars.GITOPS_REPO }}.git
+          https://x-access-token:${{ secrets.GITOPS_PAT }}@github.com/${{ secrets.GITOPS_REPO }}.git
 
       ########################################################
       # Install yq
