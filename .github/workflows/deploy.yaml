@@ -115,7 +115,8 @@ jobs:
 
         with:
 
-          context: ./services/worker-python
+          context: .
+          file: ./services/worker-python/Dockerfile
 
           push: true
 
