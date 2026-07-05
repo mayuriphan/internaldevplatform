@@ -178,7 +178,7 @@ jobs:
           | select(.name=="api")
           | .image)
 
-          = "idp-api:${{ needs.build.outputs.image_tag }}"
+          = "${{ needs.build.outputs.ecr_registry }}/${{ env.API_REPOSITORY }}:${{ needs.build.outputs.image_tag }}"
 
           ' apps/idp/api/api-deployment.yaml
 
@@ -198,7 +198,7 @@ jobs:
           | select(.name=="worker")
           | .image)
 
-          = "idp-worker:${{ needs.build.outputs.image_tag }}"
+          = "${{ needs.build.outputs.ecr_registry }}/${{ env.WORKER_REPOSITORY }}:${{ needs.build.outputs.image_tag }}"
 
           ' apps/idp/worker/worker-deployment.yaml
 
