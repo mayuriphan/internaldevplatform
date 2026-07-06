@@ -87,6 +87,11 @@ jobs:
           echo "registry=$REGISTRY" >> $GITHUB_OUTPUT
           echo "image_tag=$TAG" >> $GITHUB_OUTPUT
 
+      - name: Verify metadata
+          run: |
+            echo "Registry = '${{ steps.meta.outputs.registry }}'"
+            echo "Tag      = '${{ steps.meta.outputs.image_tag }}'"
+
       ########################################################
       # Build & Push API
       ########################################################
@@ -125,6 +130,12 @@ jobs:
 
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Debug build outputs
+        run: |
+          echo "Registry: '${{ needs.build.outputs.ecr_registry }}'"
+          echo "Tag: '${{ needs.build.outputs.image_tag }}'"
+          echo "API repo: '${{ env.API_REPOSITORY }}'"
 
 #############################################################
 # UPDATE GITOPS
