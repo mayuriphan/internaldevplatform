@@ -72,6 +72,13 @@ resource "aws_instance" "k3s" {
     aws_security_group.k3s.id
   ]
 
+  root_block_device {
+    volume_size           = 30
+    volume_type           = "gp3"
+    delete_on_termination = true
+    encrypted             = true
+  }
+
   tags = {
     Name = "k3s-server"
   }
