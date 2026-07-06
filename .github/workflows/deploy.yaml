@@ -88,9 +88,9 @@ jobs:
           echo "image_tag=$TAG" >> $GITHUB_OUTPUT
 
       - name: Verify metadata
-          run: |
-            echo "Registry = '${{ steps.meta.outputs.registry }}'"
-            echo "Tag      = '${{ steps.meta.outputs.image_tag }}'"
+        run: |
+          echo "Registry = '${{ steps.meta.outputs.registry }}'"
+          echo "Tag      = '${{ steps.meta.outputs.image_tag }}'"
 
       ########################################################
       # Build & Push API
