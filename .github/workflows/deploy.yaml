@@ -30,9 +30,9 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    outputs:
-      image_tag: ${{ steps.meta.outputs.image_tag }}
-      ecr_registry: ${{ steps.meta.outputs.registry }}
+    # outputs:
+    #   image_tag: ${{ steps.meta.outputs.image_tag }}
+    #   ecr_registry: ${{ steps.meta.outputs.registry }}
 
     steps:
 
@@ -87,10 +87,10 @@ jobs:
           echo "registry=$REGISTRY" >> $GITHUB_OUTPUT
           echo "image_tag=$TAG" >> $GITHUB_OUTPUT
 
-      - name: Verify metadata
-        run: |
-          echo "Registry = '${{ steps.meta.outputs.registry }}'"
-          echo "Tag      = '${{ steps.meta.outputs.image_tag }}'"
+      # - name: Verify metadata
+      #   run: |
+      #     echo "Registry = '${{ steps.meta.outputs.registry }}'"
+      #     echo "Tag      = '${{ steps.meta.outputs.image_tag }}'"
 
       ########################################################
       # Build & Push API
@@ -131,11 +131,11 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Debug build outputs
-        run: |
-          echo "Registry: '${{ needs.build.outputs.ecr_registry }}'"
-          echo "Tag: '${{ needs.build.outputs.image_tag }}'"
-          echo "API repo: '${{ env.API_REPOSITORY }}'"
+      # - name: Debug build outputs
+      #   run: |
+      #     echo "Registry: '${{ needs.build.outputs.ecr_registry }}'"
+      #     echo "Tag: '${{ needs.build.outputs.image_tag }}'"
+      #     echo "API repo: '${{ env.API_REPOSITORY }}'"
 
 #############################################################
 # UPDATE GITOPS
@@ -150,6 +150,21 @@ jobs:
     needs: build
 
     steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Generate Metadata
+        id: meta
+        run: |
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          REGISTRY=${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+          TAG=${GITHUB_SHA::7}
+
+          echo "registry=$REGISTRY" >> $GITHUB_OUTPUT
+          echo "image_tag=$TAG" >> $GITHUB_OUTPUT
 
       ########################################################
       # Clone GitOps Repo
@@ -173,6 +188,11 @@ jobs:
 
           sudo chmod +x /usr/local/bin/yq
 
+      - name: Verify updated images
+        run: |
+          grep "image:" git-ops/apps/idp/api/api-deployment.yaml
+          grep "image:" git-ops/apps/idp/worker/worker-deployment.yaml
+
       ########################################################
       # Update API Image
       ########################################################
@@ -189,7 +209,7 @@ jobs:
           | select(.name=="api")
           | .image)
 
-          = "${{ needs.build.outputs.ecr_registry }}/${{ env.API_REPOSITORY }}:${{ needs.build.outputs.image_tag }}"
+          = "${{ steps.meta.outputs.registry }}/${{ env.API_REPOSITORY }}:${{ steps.meta.outputs.image_tag }}"
 
           ' apps/idp/api/api-deployment.yaml
 
@@ -209,7 +229,7 @@ jobs:
           | select(.name=="worker")
           | .image)
 
-          = "${{ needs.build.outputs.ecr_registry }}/${{ env.WORKER_REPOSITORY }}:${{ needs.build.outputs.image_tag }}"
+          = "${{ steps.meta.outputs.registry }}/${{ env.WORKER_REPOSITORY }}:${{ steps.meta.outputs.image_tag }}"
 
           ' apps/idp/worker/worker-deployment.yaml
 
@@ -232,6 +252,6 @@ jobs:
           git diff --cached --quiet && exit 0
 
           git commit -m \
-          "Deploy image ${{ needs.build.outputs.image_tag }}"
+          "Deploy image ${{ steps.meta.outputs.image_tag }}"
 
           git push
