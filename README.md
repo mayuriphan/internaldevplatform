@@ -1,4 +1,4 @@
-Currently in process:
+Currently in progress:
 ```
 InternalDeveloperPlatformOROpenServiceBroker
 ├─ README.md
@@ -44,6 +44,7 @@ InternalDeveloperPlatformOROpenServiceBroker
 │     │  ├─ outputs.tf
 │     │  └─ variables.tf
 │     ├─ main.tf
+│     ├─ outputs.tf
 │     ├─ providers.tf
 │     ├─ rds
 │     │  ├─ main.tf
