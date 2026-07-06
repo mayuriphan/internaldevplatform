@@ -2,7 +2,9 @@
 
 ![alt text](image-1.png)
 
+Afer updateS:
 
+![alt text](image-2.png)
 
 ```
 InternalDeveloperPlatformOROpenServiceBroker
