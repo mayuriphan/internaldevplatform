@@ -65,7 +65,7 @@ resource "aws_security_group" "k3s" {
 resource "aws_instance" "k3s" {
   ami           = var.ami
   instance_type = "t3.small"
-
+  iam_instance_profile = aws_iam_instance_profile.k3s.name
   key_name = var.key_name
 
   vpc_security_group_ids = [
