@@ -15,7 +15,9 @@ module "rds" {
 module "redis" {
   source = "./redis"
 
-  subnet_ids = module.vpc.private_subnets
+  subnet_ids            = module.vpc.private_subnets
+  vpc_id                = module.vpc.vpc_id
+  k3s_security_group_id = aws_security_group.k3s.id
 }
 
 module "sqs" {
@@ -28,6 +30,7 @@ module "ecr" {
 
 resource "aws_security_group" "k3s" {
   name = "k3s-sg"
+  vpc_id = module.vpc.vpc_id
 
   ingress {
     from_port = 22
@@ -67,7 +70,8 @@ resource "aws_instance" "k3s" {
   instance_type = "t3.small"
   iam_instance_profile = module.iam.k3s_instance_profile_name
   key_name = var.key_name
-
+  subnet_id = module.vpc.public_subnets[0]
+  associate_public_ip_address = true
   vpc_security_group_ids = [
     aws_security_group.k3s.id
   ]

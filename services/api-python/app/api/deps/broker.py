@@ -1,3 +1,5 @@
+from app.db.database import get_db
+from app.db.redis import redis_client
 from app.repositories.service_repository import ServiceRepository
 from app.repositories.job_repository import JobRepository
 from app.services.job_service import JobService
@@ -7,10 +9,9 @@ from app.services.idempotency_service import IdempotencyService
 
 def get_broker_service():
 
-    db = None
-    redis_client = None
     sqs_client = None
 
+    db = get_db()
     service_repo = ServiceRepository(db)
     job_repo = JobRepository(db)
 
