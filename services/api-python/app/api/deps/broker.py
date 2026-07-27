@@ -6,8 +6,11 @@ from app.services.job_service import JobService
 from app.services.broker_service import BrokerService
 from app.services.idempotency_service import IdempotencyService
 
+from fastapi import Depends
+from sqlalchemy.orm import Session
 
-def get_broker_service():
+
+def get_broker_service(db: Session = Depends(get_db)):
 
     sqs_client = None
 
