@@ -1,0 +1,21 @@
+---
+- name: Get AWS Account ID
+  command: aws sts get-caller-identity --query Account --output text
+  register: aws_account
+  changed_when: false
+
+- name: Ensure idp namespace exists
+  shell: |
+    kubectl create namespace idp --dry-run=client -o yaml | kubectl apply -f -
+
+- name: Delete existing ECR secret if present
+  command: kubectl delete secret ecr-secret -n idp --ignore-not-found
+  changed_when: false
+
+- name: Create ECR image pull secret
+  shell: |
+    kubectl create secret docker-registry ecr-secret \
+      --docker-server={{ aws_account.stdout }}.dkr.ecr.{{ aws_region }}.amazonaws.com \
+      --docker-username=AWS \
+      --docker-password="$(aws ecr get-login-password --region {{ aws_region }})" \
+      -n {{ namespace }}
