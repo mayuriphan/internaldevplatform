@@ -1,0 +1,12 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "idp-common"
+version = "0.1.0"
+dependencies = [
+    "sqlalchemy",
+    "psycopg2-binary",
+    "boto3"
+]

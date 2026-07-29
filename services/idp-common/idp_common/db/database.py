@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-from app.config.settings import settings
+from idp_common.config.settings import settings
 
 #Singleton pattern for database engine and session: Only one engine and connection pool per process.
 class DatabaseManager:
@@ -40,3 +40,14 @@ def get_db():
         yield db
     finally:
         db.close()
+
+def init_db():
+
+    if settings.ENVIRONMENT != "development":
+        return
+    
+    from idp_common.models.service_request import ServiceRequest
+    from idp_common.models.job import Job
+
+
+    Base.metadata.create_all(bind=db_manager.engine)

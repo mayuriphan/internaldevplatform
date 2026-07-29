@@ -6,12 +6,16 @@ from app.api.health import router as health_router
 
 from app.middleware.correlation_id import CorrelationIdMiddleware
 from app.middleware.request_logger import RequestLoggingMiddleware
-from app.middleware.ratelimit import RateLimitMiddleware
+# from app.middleware.ratelimit import RateLimitMiddleware
 
-from app.config.settings import settings
+from idp_common.config.settings import settings
+
+from idp_common.db.database import init_db
 
 
 app = FastAPI(title=settings.APP_NAME)
+
+init_db()
 
 
 # Routers

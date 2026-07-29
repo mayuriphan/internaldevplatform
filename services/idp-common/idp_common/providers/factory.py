@@ -1,6 +1,6 @@
-from app.providers.aws_provider import AWSProvider
-from app.providers.k8_provider import KubernetesProvider
-from app.providers.postgres_provider import PostgresProvider
+from idp_common.providers.aws_provider import AWSProvider
+from idp_common.providers.k8_provider import KubernetesProvider
+from idp_common.providers.postgres_provider import PostgresProvider
 
 
 class ProviderFactory:

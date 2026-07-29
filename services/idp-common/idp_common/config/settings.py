@@ -10,6 +10,7 @@ class Settings(BaseSettings):
 
     API_PREFIX: str = "/api/v1"
 
+    ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
     POSTGRES_HOST: str = os.getenv("POSTGRES_HOST", "localhost")
     POSTGRES_PORT: int = int(os.getenv("POSTGRES_PORT", 5432))
     POSTGRES_DB: str = os.getenv("POSTGRES_DB", "idp")

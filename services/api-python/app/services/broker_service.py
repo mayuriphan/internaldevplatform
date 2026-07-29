@@ -1,9 +1,9 @@
 import json
 
-from app.providers.factory import ProviderFactory
+from idp_common.providers.factory import ProviderFactory
 from app.services.job_service import JobService
 from app.services.idempotency_service import IdempotencyService
-from app.repositories.service_repository import ServiceRepository
+from idp_common.repositories.service_repository import ServiceRepository
 
 
 class BrokerService:

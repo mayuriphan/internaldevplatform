@@ -1,11 +1,18 @@
-import json
-import time
+import boto3
 
 from jobs.executer import JobExecutor
+from provision_worker import ProvisionWorker
 from app.providers.factory import ProviderFactory
 from app.repositories.job_repository import JobRepository
 from app.db.database import db_manager
 
+
+import boto3
+
+sqs_client = boto3.client(
+    "sqs",
+    region_name="ap-south-1"
+)
 
 def process_message(message: dict):
 
@@ -22,15 +29,15 @@ def process_message(message: dict):
 
 def run_worker():
 
-    print("Worker started... listening for jobs")
+    print("Worker started...")
+
+    worker = ProvisionWorker(
+        sqs_client=sqs_client,
+        executor=executor
+    )
 
     while True:
-        fake_message = None
-
-        if fake_message:
-            process_message(json.loads(fake_message))
-
-        time.sleep(2)
+        worker.poll()
 
 
 if __name__ == "__main__":

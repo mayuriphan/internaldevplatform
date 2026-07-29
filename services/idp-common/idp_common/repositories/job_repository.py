@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from app.db.models import Job
+from idp_common.models.job import Job
 
 
 class JobRepository:

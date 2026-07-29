@@ -1,5 +1,5 @@
 import redis
-from app.config.settings import settings
+from idp_common.config.settings import settings
 
 redis_client = redis.Redis(
     host=settings.REDIS_HOST,

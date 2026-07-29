@@ -1,7 +1,16 @@
-from app.providers.base import BaseProvider
+import boto3
+
+from idp_common.config.settings import settings
+from idp_common.providers.base import BaseProvider
 
 
-class PostgresProvider(BaseProvider):
+class AWSProvider(BaseProvider):
+
+    def __init__(self):
+
+        self.session = boto3.session.Session(
+            region_name=settings.AWS_REGION
+        )
 
     def provision(
         self,
@@ -10,7 +19,7 @@ class PostgresProvider(BaseProvider):
     ):
 
         return {
-            "provider": "postgres",
+            "provider": "aws",
             "resource_name": resource_name,
             "status": "PROVISIONING",
         }
@@ -32,5 +41,5 @@ class PostgresProvider(BaseProvider):
 
         return {
             "resource_id": resource_id,
-            "status": "RUNNING",
+            "status": "UNKNOWN",
         }

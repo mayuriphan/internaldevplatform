@@ -1,4 +1,4 @@
-from app.providers.base import BaseProvider
+from idp_common.providers.base import BaseProvider
 
 
 class KubernetesProvider(BaseProvider):

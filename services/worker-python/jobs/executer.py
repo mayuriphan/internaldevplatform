@@ -41,4 +41,5 @@ class JobExecutor:
                 error_message=str(e)
             )
 
-            print(f"Job {job_id} failed: {str(e)}")
+            # print(f"Job {job_id} failed: {str(e)}")
+            raise

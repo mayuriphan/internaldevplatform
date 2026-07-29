@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from app.db.models import ServiceRequest
+from idp_common.models.service_request import ServiceRequest
 
 
 class ServiceRepository:

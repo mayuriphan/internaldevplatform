@@ -101,7 +101,8 @@ jobs:
 
         with:
 
-          context: ./services/api-python
+          context: .
+          file: ./services/api-python/Dockerfile
 
           push: true
 

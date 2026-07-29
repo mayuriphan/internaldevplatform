@@ -1,4 +1,4 @@
-from app.repositories.job_repository import JobRepository
+from idp_common.repositories.job_repository import JobRepository
 
 
 class JobService:
