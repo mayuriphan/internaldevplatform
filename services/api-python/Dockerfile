@@ -2,14 +2,14 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-COPY idp-common /app/idp-common
+COPY services/idp-common /app/idp-common
 
 RUN pip install -e /app/idp-common
 
-COPY api-python/requirements.txt .
+COPY services/api-python/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY api-python .
+COPY services/api-python .
 
 EXPOSE 8000
 

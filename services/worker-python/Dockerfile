@@ -4,13 +4,13 @@ WORKDIR /app
 
 ENV PYTHONUNBUFFERED=1
 
-COPY idp-common /app/idp-common
+COPY services/idp-common /app/idp-common
 
 RUN pip install -e /app/idp-common
 
-COPY worker-python/requirements.txt .
+COPY services/worker-python/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY worker-python .
+COPY services/worker-python .
 
 CMD ["python", "-m", "worker.main"]

@@ -220,7 +220,6 @@ InternalDeveloperPlatformOROpenServiceBroker
    │  │     └─ logger.py
    │  ├─ requirements.txt
    │  └─ tests
-   ├─ app
    ├─ idp-common
    │  ├─ idp_common
    │  │  ├─ config
@@ -254,9 +253,6 @@ InternalDeveloperPlatformOROpenServiceBroker
    │  └─ pyproject.toml
    └─ worker-python
       ├─ Dockerfile
-      ├─ app
-      ├─ idp-common
-      │  └─ idp_common
       ├─ jobs
       │  └─ executor.py
       ├─ requirements.txt
