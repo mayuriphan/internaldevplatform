@@ -15,7 +15,7 @@ This workflow automates the build and deployment process for the IDP services.
   * API service
   * Worker service
 * Pushes versioned images to Amazon ECR.
-* Designed to integrate with a GitOps repository for automated Kubernetes deployments (planned/optional).
+* Designed to integrate with a GitOps repository for automated Kubernetes deployments.
 
 ---
 
