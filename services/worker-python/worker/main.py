@@ -1,43 +1,47 @@
 import boto3
 
-from jobs.executer import JobExecutor
-from provision_worker import ProvisionWorker
-from app.providers.factory import ProviderFactory
-from app.repositories.job_repository import JobRepository
-from app.db.database import db_manager
+from jobs.executor import JobExecutor
+from worker.provision_worker import ProvisionWorker
 
-
-import boto3
-
-sqs_client = boto3.client(
-    "sqs",
-    region_name="ap-south-1"
-)
-
-def process_message(message: dict):
-
-    db = db_manager.SessionLocal()
-    job_repo = JobRepository(db)
-
-    executor = JobExecutor(
-        job_repo=job_repo,
-        provider_factory=ProviderFactory
-    )
-
-    executor.execute(message)
+from idp_common.db.database import db_manager
+from idp_common.messages.sqs_client import SQSClient
+from idp_common.providers.factory import ProviderFactory
+from idp_common.repositories.job_repository import JobRepository
+from idp_common.repositories.service_repository import ServiceRepository
 
 
 def run_worker():
 
     print("Worker started...")
 
-    worker = ProvisionWorker(
-        sqs_client=sqs_client,
-        executor=executor
+    # Database
+    db = db_manager.SessionLocal()
+
+    # Repository
+    job_repo = JobRepository(db)
+    service_repo = ServiceRepository(db)
+
+    # Business logic
+    executor = JobExecutor(
+        job_repo=job_repo,
+        service_repo=service_repo,
+        provider_factory=ProviderFactory,
     )
 
-    while True:
-        worker.poll()
+    # Messaging
+    sqs_client = SQSClient()
+
+    # Worker
+    worker = ProvisionWorker(
+        sqs_client=sqs_client,
+        executor=executor,
+    )
+
+    try:
+        while True:
+            worker.poll()
+    finally:
+        db.close()
 
 
 if __name__ == "__main__":

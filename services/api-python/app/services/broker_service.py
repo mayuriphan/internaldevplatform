@@ -47,10 +47,7 @@ class BrokerService:
         }
 
         if self.sqs:
-            self.sqs.send_message(
-                QueueUrl=self.sqs.queue_url,
-                MessageBody=json.dumps(message),
-            )
+            self.sqs.send(message)
 
         result = {
             "request_id": service_request.id,

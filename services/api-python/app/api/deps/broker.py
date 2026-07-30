@@ -1,5 +1,6 @@
-from idp_common.db.database import get_db
 from app.db.redis import redis_client
+from idp_common.db.database import get_db
+from idp_common.messages.sqs_client import SQSClient
 from idp_common.repositories.service_repository import ServiceRepository
 from idp_common.repositories.job_repository import JobRepository
 from app.services.job_service import JobService
@@ -12,7 +13,7 @@ from sqlalchemy.orm import Session
 
 def get_broker_service(db: Session = Depends(get_db)):
 
-    sqs_client = None
+    sqs_client = SQSClient()
 
     service_repo = ServiceRepository(db)
     job_repo = JobRepository(db)

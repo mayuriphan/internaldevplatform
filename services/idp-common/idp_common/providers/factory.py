@@ -10,15 +10,15 @@ class ProviderFactory:
 
         providers = {
             "aws": AWSProvider,
-            "postgres": PostgresProvider,
-            "kubernetes": KubernetesProvider,
+            # "azure": AzureProvider,
+            # "gcp": GCPProvider,
         }
 
-        provider_class = providers.get(provider_name)
+        provider = providers.get(provider_name)
 
-        if provider_class is None:
+        if provider is None:
             raise ValueError(
                 f"Unsupported provider: {provider_name}"
             )
 
-        return provider_class()
+        return provider()

@@ -1,4 +1,7 @@
+from idp_common.config.settings import settings
 from idp_common.providers.base import BaseProvider
+from idp_common.db.postgres_admin import PostgresAdmin
+from idp_common.utils.secrets import generate_password
 
 
 class PostgresProvider(BaseProvider):
@@ -8,11 +11,32 @@ class PostgresProvider(BaseProvider):
         resource_name: str,
         parameters: dict,
     ):
+        service_name = parameters["service_name"]
+        database_name = f"{service_name}_{settings.ENVIRONMENT}"
+        username = (
+            f"{service_name.replace('-', '_')}_{settings.ENVIRONMENT}"
+        )
+        password = generate_password()
+        admin = PostgresAdmin()
+
+        admin.create_database(
+            database_name
+        )
+
+        admin.create_user(
+            username,
+            password,
+            database_name
+        )
 
         return {
             "provider": "postgres",
-            "resource_name": resource_name,
-            "status": "PROVISIONING",
+            "resource_name": database_name,
+            "username": username,
+            "password": password,
+            "host": settings.POSTGRES_HOST,
+            "port": settings.POSTGRES_PORT,
+            "status": "CREATED",
         }
 
     def deprovision(

@@ -1,6 +1,6 @@
 import json
 
-from app.jobs.executor import JobExecutor
+from jobs.executor import JobExecutor
 
 
 class ProvisionWorker:
@@ -10,8 +10,11 @@ class ProvisionWorker:
         self.executor = executor
 
     def poll(self):
+        print("Polling SQS...")
 
-        messages = self.sqs.receive_messages()
+        messages = self.sqs.receive()
+
+        print(f"Received {len(messages)} messages")
 
         for msg in messages:
 
@@ -19,4 +22,4 @@ class ProvisionWorker:
 
             self.executor.execute(body)
 
-            self.sqs.delete_message(msg)
+            self.sqs.delete(msg["ReceiptHandle"])

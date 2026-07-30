@@ -2,10 +2,15 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-COPY services/worker-python/requirements.txt .
+ENV PYTHONUNBUFFERED=1
+
+COPY idp-common /app/idp-common
+
+RUN pip install -e /app/idp-common
+
+COPY worker-python/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY services/worker-python/ .
-COPY services/api-python/app ./app
+COPY worker-python .
 
 CMD ["python", "-m", "worker.main"]
