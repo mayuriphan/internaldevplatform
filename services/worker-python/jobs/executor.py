@@ -25,9 +25,13 @@ class JobExecutor:
             )
 
             # 3. Execute provisioning
+            parameters = request["parameters"].copy()
+            parameters["service_type"] = request["service_type"]
+            resource_name = parameters["service_name"]
+
             result = provider.provision(
-                resource_name=request["service_type"],
-                parameters=request.get("parameters", {})
+                resource_name=resource_name,
+                parameters=parameters,
             )
 
             # 4. Mark SUCCESS

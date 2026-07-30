@@ -1,3 +1,109 @@
+
+---
+
+## Internal Developer Platform for resource provisioning
+
+This workflow automates the build and deployment process for the IDP services.
+
+**Features**
+
+* Triggers automatically on every push to the `main` branch.
+* Authenticates to AWS using GitHub Actions OIDC (no long-lived AWS keys).
+* Logs in to Amazon ECR.
+* Builds Docker images for:
+
+  * API service
+  * Worker service
+* Pushes versioned images to Amazon ECR.
+* Designed to integrate with a GitOps repository for automated Kubernetes deployments (planned/optional).
+
+---
+
+## Resource Provisioning
+
+The IDP exposes REST APIs that provision cloud resources asynchronously.
+
+**Workflow**
+
+```text
+Client
+   │
+   ▼
+POST /api/v1/provision
+   │
+   ▼
+API validates request
+   │
+   ▼
+Stores Service Request & Job
+   │
+   ▼
+Publishes message to Amazon SQS
+   │
+   ▼
+Worker consumes message
+   │
+   ▼
+AWS Provider
+   │
+   ├── PostgreSQL Database
+   ├── Redis
+   ├── S3 Bucket
+   ├── SQS Queue
+   ├── AWS Secrets Manager
+   └── (Extensible for additional resources)
+   │
+   ▼
+Updates Job Status
+```
+
+---
+
+## Current Supported Resources
+
+| Resource            | Status      |
+| ------------------- | ----------- |
+| PostgreSQL Database | ✅           |
+| Redis               | ✅           |
+| Amazon S3           | ✅           |
+| Amazon SQS          | ✅           |
+| AWS Secrets Manager | ✅           |
+| Kubernetes Runtime  | Placeholder |
+| Amazon ECS          | Planned     |
+
+---
+
+## Architecture Highlights
+
+* Asynchronous provisioning using Amazon SQS.
+* Provider Factory pattern for extensible resource provisioning.
+* Modular provider implementation for each AWS service.
+* Job tracking with persistent status updates.
+* Designed for GitOps-based deployments.
+* Easily extensible by implementing a new provider and registering it in the provider factory.
+
+---
+
+## Example Provisioning Request
+
+```json
+{
+  "service_type": "backend",
+  "provider": "aws",
+  "parameters": {
+    "service_name": "process-api",
+    "environment": "development",
+    "features": [
+      "postgres",
+      "redis",
+      "s3",
+      "sqs"
+    ]
+  }
+}
+```
+
+
 ![alt text](image.png)
 
 ![alt text](image-1.png)
@@ -6,10 +112,13 @@ Afer updateS:
 
 ![alt text](image-2.png)
 
+
 ```
-In Progress:
 InternalDeveloperPlatformOROpenServiceBroker
 ├─ README.md
+├─ image-1.png
+├─ image-2.png
+├─ image.png
 ├─ infra
 │  ├─ ansible
 │  │  ├─ ansible.cfg
@@ -27,6 +136,9 @@ InternalDeveloperPlatformOROpenServiceBroker
 │  │     │  └─ tasks
 │  │     │     └─ main.yaml
 │  │     ├─ bootstrap
+│  │     │  └─ tasks
+│  │     │     └─ main.yaml
+│  │     ├─ ecr-secret
 │  │     │  └─ tasks
 │  │     │     └─ main.yaml
 │  │     ├─ helm
@@ -47,6 +159,7 @@ InternalDeveloperPlatformOROpenServiceBroker
 │     │  ├─ main.tf
 │     │  └─ variables.tf
 │     ├─ iam
+│     │  ├─ ec2.tf
 │     │  ├─ github_oidc.tf
 │     │  ├─ main.tf
 │     │  ├─ outputs.tf
@@ -79,11 +192,8 @@ InternalDeveloperPlatformOROpenServiceBroker
    │  │  │  ├─ jobs.py
    │  │  │  ├─ provision.py
    │  │  │  └─ status.py
-   │  │  ├─ config
-   │  │  │  └─ settings.py
    │  │  ├─ db
-   │  │  │  ├─ database.py
-   │  │  │  └─ models.py
+   │  │  │  └─ redis.py
    │  │  ├─ dependencies.py
    │  │  ├─ jobs
    │  │  │  ├─ base.py
@@ -96,15 +206,6 @@ InternalDeveloperPlatformOROpenServiceBroker
    │  │  │  ├─ idempotency.py
    │  │  │  ├─ ratelimit.py
    │  │  │  └─ request_logger.py
-   │  │  ├─ providers
-   │  │  │  ├─ aws_provider.py
-   │  │  │  ├─ base.py
-   │  │  │  ├─ factory.py
-   │  │  │  ├─ k8_provider.py
-   │  │  │  └─ postgres_provider.py
-   │  │  ├─ repositories
-   │  │  │  ├─ job_repository.py
-   │  │  │  └─ service_repository.py
    │  │  ├─ schemas
    │  │  │  ├─ auth.py
    │  │  │  ├─ jobs.py
@@ -119,10 +220,45 @@ InternalDeveloperPlatformOROpenServiceBroker
    │  │     └─ logger.py
    │  ├─ requirements.txt
    │  └─ tests
+   ├─ app
+   ├─ idp-common
+   │  ├─ idp_common
+   │  │  ├─ config
+   │  │  │  └─ settings.py
+   │  │  ├─ db
+   │  │  │  ├─ database.py
+   │  │  │  ├─ postgres_admin.py
+   │  │  │  └─ redis_admin.py
+   │  │  ├─ messages
+   │  │  │  ├─ __init__.py
+   │  │  │  └─ sqs_client.py
+   │  │  ├─ models
+   │  │  │  ├─ __init__.py
+   │  │  │  ├─ job.py
+   │  │  │  └─ service_request.py
+   │  │  ├─ providers
+   │  │  │  ├─ aws_provider.py
+   │  │  │  ├─ base.py
+   │  │  │  ├─ factory.py
+   │  │  │  ├─ k8_provider.py
+   │  │  │  ├─ postgres_provider.py
+   │  │  │  ├─ redis_provider.py
+   │  │  │  ├─ s3_provider.py
+   │  │  │  ├─ secrets_provider.py
+   │  │  │  └─ sqs_provider.py
+   │  │  ├─ repositories
+   │  │  │  ├─ job_repository.py
+   │  │  │  └─ service_repository.py
+   │  │  └─ utils
+   │  │     └─ secrets.py
+   │  └─ pyproject.toml
    └─ worker-python
       ├─ Dockerfile
+      ├─ app
+      ├─ idp-common
+      │  └─ idp_common
       ├─ jobs
-      │  └─ executer.py
+      │  └─ executor.py
       ├─ requirements.txt
       ├─ services
       │  └─ worker_service.py

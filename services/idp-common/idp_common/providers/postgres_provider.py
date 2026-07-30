@@ -2,6 +2,7 @@ from idp_common.config.settings import settings
 from idp_common.providers.base import BaseProvider
 from idp_common.db.postgres_admin import PostgresAdmin
 from idp_common.utils.secrets import generate_password
+from idp_common.providers.secrets_provider import SecretsProvider
 
 
 class PostgresProvider(BaseProvider):
@@ -29,11 +30,32 @@ class PostgresProvider(BaseProvider):
             database_name
         )
 
+        secret = SecretsProvider().provision(
+
+            resource_name,
+
+            {
+                "secret_name": f"{database_name}-credentials",
+
+                "secret_value": {
+
+                    "host": settings.POSTGRES_HOST,
+
+                    "port": settings.POSTGRES_PORT,
+
+                    "database": database_name,
+
+                    "username": username,
+
+                    "password": password,
+                },
+            },
+        )
+
         return {
             "provider": "postgres",
             "resource_name": database_name,
-            "username": username,
-            "password": password,
+            "secret": secret,
             "host": settings.POSTGRES_HOST,
             "port": settings.POSTGRES_PORT,
             "status": "CREATED",
