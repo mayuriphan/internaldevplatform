@@ -12,4 +12,11 @@
     release_namespace: ingress-nginx
     create_namespace: true
     wait: true
+    timeout: 10m
     kubeconfig: "{{ kubeconfig_path }}"
+    values:
+      controller:
+        service:
+          type: NodePort
+        admissionWebhooks:
+          enabled: true

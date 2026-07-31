@@ -5,6 +5,11 @@
     repo_url: https://argoproj.github.io/argo-helm
     kubeconfig: "{{ kubeconfig_path }}"
 
+- name: Copy Argo CD values file
+  template:
+    src: argocd-values.yaml
+    dest: /tmp/argocd-values.yaml
+
 - name: Install Argo CD
   kubernetes.core.helm:
     name: argocd
@@ -12,4 +17,7 @@
     release_namespace: argocd
     create_namespace: true
     wait: true
+    timeout: 10m
+    values_files:
+      - /tmp/argocd-values.yaml
     kubeconfig: "{{ kubeconfig_path }}"

@@ -5,3 +5,5 @@
   roles:
     - k3s
     - helm
+    - ingress
+    - external_secrets

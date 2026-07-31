@@ -7,3 +7,4 @@ namespace: idp
 
 k3s_disable:
   - traefik
+  - servicelb

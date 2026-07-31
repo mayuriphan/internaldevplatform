@@ -56,6 +56,21 @@ resource "aws_security_group" "k3s" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    from_port   = 30317
+    to_port     = 30317
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 32389
+    to_port     = 32389
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+
   egress {
     from_port = 0
     to_port = 0
@@ -90,8 +105,12 @@ resource "aws_instance" "k3s" {
 
 module "iam" {
   source = "./iam"
+  
   github_owner = var.github_owner
   github_repo  = var.github_repo
+
+  job_queue_arn = module.sqs.job_queue_arn
+  dlq_arn       = module.sqs.dlq_arn
 }
 
 # module "eks" {

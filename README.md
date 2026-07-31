@@ -1,4 +1,3 @@
-
 ---
 
 ## Internal Developer Platform for resource provisioning
@@ -133,12 +132,17 @@ InternalDeveloperPlatformOROpenServiceBroker
 │  │  ├─ requirements.yaml
 │  │  └─ roles
 │  │     ├─ argocd
-│  │     │  └─ tasks
-│  │     │     └─ main.yaml
+│  │     │  ├─ tasks
+│  │     │  │  └─ main.yaml
+│  │     │  └─ templates
+│  │     │     └─ argocd-values.yaml
 │  │     ├─ bootstrap
 │  │     │  └─ tasks
 │  │     │     └─ main.yaml
 │  │     ├─ ecr-secret
+│  │     │  └─ tasks
+│  │     │     └─ main.yaml
+│  │     ├─ external_secrets
 │  │     │  └─ tasks
 │  │     │     └─ main.yaml
 │  │     ├─ helm
@@ -174,7 +178,8 @@ InternalDeveloperPlatformOROpenServiceBroker
 │     │  ├─ main.tf
 │     │  └─ varibales.tf
 │     ├─ sqs
-│     │  └─ main.tf
+│     │  ├─ main.tf
+│     │  └─ outputs.tf
 │     ├─ variables.tf
 │     └─ vpc
 │        ├─ main.tf
