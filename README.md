@@ -1,5 +1,3 @@
----
-
 ## Internal Developer Platform for resource provisioning
 
 This workflow automates the build and deployment process for the IDP services.
