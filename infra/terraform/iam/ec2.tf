@@ -64,10 +64,13 @@ resource "aws_iam_policy" "k3s_secrets_manager" {
       {
         Effect = "Allow"
         Action = [
+          "secretsmanager:CreateSecret",
+          "secretsmanager:PutSecretValue",
+          "secretsmanager:DescribeSecret",
           "secretsmanager:GetSecretValue",
-          "secretsmanager:DescribeSecret"
+          "secretsmanager:DeleteSecret"
         ]
-        Resource = "arn:aws:secretsmanager:ap-south-1:187457215475:secret:idp/prod/app*"
+        Resource = "arn:aws:secretsmanager:ap-south-1:187457215475:secret:idp/*"
       }
     ]
   })

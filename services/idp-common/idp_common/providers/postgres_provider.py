@@ -35,7 +35,7 @@ class PostgresProvider(BaseProvider):
             resource_name,
 
             {
-                "secret_name": f"{database_name}-credentials",
+                "secret_name": f"idp/{database_name}-credentials",
 
                 "secret_value": {
 

@@ -84,6 +84,7 @@ class SecretsProvider(BaseProvider):
         self.client.delete_secret(
             SecretId=resource_id,
             ForceDeleteWithoutRecovery=True,
+            # RecoveryWindowInDays=7,
         )
 
 
