@@ -29,10 +29,11 @@ class SQSClient:
     def receive(self, max_messages: int = 10):
 
         response = self.client.receive_message(
-        QueueUrl=self.job_queue,
-        MaxNumberOfMessages=10,
-        WaitTimeSeconds=20,
-    )
+            QueueUrl=self.job_queue,
+            MaxNumberOfMessages=max_messages,
+            WaitTimeSeconds=20,
+            AttributeNames=["ApproximateReceiveCount"],
+        )
 
         return response.get("Messages", [])
     

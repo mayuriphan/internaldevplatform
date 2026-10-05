@@ -48,6 +48,7 @@ def init_db():
     
     from idp_common.models.service_request import ServiceRequest
     from idp_common.models.job import Job
+    from idp_common.models.outbox import OutboxMessage
 
 
     Base.metadata.create_all(bind=db_manager.engine)
