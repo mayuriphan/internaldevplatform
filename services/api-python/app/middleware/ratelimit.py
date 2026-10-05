@@ -1,7 +1,18 @@
 import time
+
+from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
-from fastapi.responses import JSONResponse
+
+
+SKIP_PATHS = {
+    "/health/live",
+    "/health/ready",
+    "/api/v1/login",
+    "/docs",
+    "/openapi.json",
+    "/redoc",
+}
 
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
@@ -13,7 +24,10 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next):
 
-        client_ip = request.client.host
+        if request.url.path in SKIP_PATHS:
+            return await call_next(request)
+
+        client_ip = request.client.host if request.client else "unknown"
         key = f"rate:{client_ip}:{int(time.time() // 60)}"
 
         current = self.redis.get(key)
@@ -22,6 +36,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             return JSONResponse(
                 status_code=429,
                 content={"detail": "Rate limit exceeded"},
+                headers={"Retry-After": "60"},
             )
 
         pipe = self.redis.pipeline()
