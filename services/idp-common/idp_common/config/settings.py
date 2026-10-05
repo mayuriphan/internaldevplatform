@@ -38,7 +38,7 @@ class Settings(BaseSettings):
     OUTBOX_POLL_INTERVAL_SECONDS: float = float(
         os.getenv("OUTBOX_POLL_INTERVAL_SECONDS", "2.0")
     )
-    OUTBOX_BATCH_SIZE: int = int(os.getenv("OUTBOX_BATCH_SIZE", "10"))
+    OUTBOX_BATCH_SIZE: int = int(os.getenv("OUTBOX_BATCH_SIZE", "5"))
     OUTBOX_MAX_RETRIES: int = int(os.getenv("OUTBOX_MAX_RETRIES", "5"))
 
     WORKER_MAX_RECEIVE_COUNT: int = int(os.getenv("WORKER_MAX_RECEIVE_COUNT", "3"))
