@@ -27,11 +27,11 @@ class Settings(BaseSettings):
     SQS_DLQ_URL: str = os.getenv("SQS_DLQ_URL", "")
     SQS_JOBQ_URL: str = os.getenv("SQS_JOBQ_URL", "")
 
-    RATE_LIMIT_PER_MINUTE: int = 60
+    RATE_LIMIT_PER_MINUTE: int = int(os.getenv("RATE_LIMIT_PER_MINUTE", "5"))
 
     JWT_SECRET: str = os.getenv("JWT_SECRET", "")
     JWT_ALGORITHM: str = "HS256"
-    JWT_EXPIRE_HOURS: int = int(os.getenv("JWT_EXPIRE_HOURS", "24"))
+    JWT_EXPIRE_HOURS: int = int(os.getenv("JWT_EXPIRE_HOURS", ""))
     API_USERNAME: str = os.getenv("API_USERNAME", "")
     API_PASSWORD: str = os.getenv("API_PASSWORD", "")
 
