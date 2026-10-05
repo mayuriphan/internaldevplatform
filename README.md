@@ -60,11 +60,10 @@ Updates Job Status
 
 | Resource            | Status      |
 | ------------------- | ----------- |
-| PostgreSQL Database | ✅           |
-| Redis               | ✅           |
-| Amazon S3           | ✅           |
-| Amazon SQS          | ✅           |
-| AWS Secrets Manager | ✅           |
+| PostgreSQL Database | ✅          |
+| Redis               | ✅          |
+| Amazon S3           | ✅          |
+| Amazon SQS          | ✅          |
 | Kubernetes Runtime  | Placeholder |
 | Amazon ECS          | Planned     |
 
@@ -81,6 +80,16 @@ Updates Job Status
 
 ---
 
+## Security & Reliability
+
+* Authentication: Bearer-token authentication for protected API endpoints.
+* Rate Limiting: Redis-backed per-IP rate limiting with a configurable requests-per-minute limit.
+* Idempotency: Redis-backed atomic idempotency using `SET NX` to prevent duplicate provisioning requests.
+* Secrets Management: AWS Secrets Manager integrated with Kubernetes through External Secrets.
+* Asynchronous Processing: Amazon SQS and a Dead Letter Queue (DLQ) for failed jobs.
+
+---
+
 ## Example Provisioning Request
 
 ```json
@@ -88,12 +97,15 @@ Updates Job Status
   "service_type": "backend",
   "provider": "aws",
   "parameters": {
-    "service_name": "process-api",
+    "runtime": "kubernetes",
+    "service_name": "process_api",
     "environment": "development",
+    "template": "python-api",
+    "replicas": 1,
+    "cpu": "500m",
+    "memory": "512Mi",
     "features": [
       "postgres",
-      "redis",
-      "s3",
       "sqs"
     ]
   }
@@ -110,9 +122,14 @@ Afer updateS:
 ![alt text](image-2.png)
 
 
+
 ```
 InternalDeveloperPlatformOROpenServiceBroker
 ├─ README.md
+├─ api-python
+│  └─ app
+├─ idp-common
+│  └─ idp_common
 ├─ image-1.png
 ├─ image-2.png
 ├─ image.png
@@ -166,6 +183,7 @@ InternalDeveloperPlatformOROpenServiceBroker
 │     │  ├─ main.tf
 │     │  ├─ outputs.tf
 │     │  └─ variables.tf
+│     ├─ idp-tfplan
 │     ├─ main.tf
 │     ├─ outputs.tf
 │     ├─ providers.tf
@@ -190,6 +208,7 @@ InternalDeveloperPlatformOROpenServiceBroker
    │  │  ├─ api
    │  │  │  ├─ auth.py
    │  │  │  ├─ deps
+   │  │  │  │  ├─ auth.py
    │  │  │  │  └─ broker.py
    │  │  │  ├─ health.py
    │  │  │  ├─ jobs.py
@@ -217,12 +236,14 @@ InternalDeveloperPlatformOROpenServiceBroker
    │  │  │  ├─ auth_service.py
    │  │  │  ├─ broker_service.py
    │  │  │  ├─ idempotency_service.py
-   │  │  │  └─ job_service.py
+   │  │  │  ├─ job_service.py
+   │  │  │  └─ outbox_relay.py
    │  │  └─ utils
    │  │     ├─ exceptions.py
    │  │     └─ logger.py
    │  ├─ requirements.txt
    │  └─ tests
+   ├─ app
    ├─ idp-common
    │  ├─ idp_common
    │  │  ├─ config
@@ -233,10 +254,12 @@ InternalDeveloperPlatformOROpenServiceBroker
    │  │  │  └─ redis_admin.py
    │  │  ├─ messages
    │  │  │  ├─ __init__.py
+   │  │  │  ├─ outbox_publisher.py
    │  │  │  └─ sqs_client.py
    │  │  ├─ models
    │  │  │  ├─ __init__.py
    │  │  │  ├─ job.py
+   │  │  │  ├─ outbox.py
    │  │  │  └─ service_request.py
    │  │  ├─ providers
    │  │  │  ├─ aws_provider.py
@@ -250,12 +273,17 @@ InternalDeveloperPlatformOROpenServiceBroker
    │  │  │  └─ sqs_provider.py
    │  │  ├─ repositories
    │  │  │  ├─ job_repository.py
+   │  │  │  ├─ outbox_repository.py
    │  │  │  └─ service_repository.py
    │  │  └─ utils
+   │  │     ├─ retry.py
    │  │     └─ secrets.py
    │  └─ pyproject.toml
    └─ worker-python
       ├─ Dockerfile
+      ├─ app
+      ├─ idp-common
+      │  └─ idp_common
       ├─ jobs
       │  └─ executor.py
       ├─ requirements.txt
