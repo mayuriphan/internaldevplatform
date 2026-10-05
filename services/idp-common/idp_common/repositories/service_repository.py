@@ -14,6 +14,7 @@ class ServiceRepository:
         provider: str,
         payload: str,
         status: str = "PENDING",
+        commit: bool = True,
     ) -> ServiceRequest:
 
         service_request = ServiceRequest(
@@ -24,8 +25,12 @@ class ServiceRepository:
         )
 
         self.db.add(service_request)
-        self.db.commit()
-        self.db.refresh(service_request)
+
+        if commit:
+            self.db.commit()
+            self.db.refresh(service_request)
+        else:
+            self.db.flush()
 
         return service_request
 

@@ -1,13 +1,21 @@
-from fastapi import APIRouter, Depends, HTTPException
+from app.api.deps.auth import get_current_user
+from app.schemas.jobs import JobResponse
+from fastapi import APIRouter
+from fastapi import Depends
+from fastapi import HTTPException
 from idp_common.db.database import get_db
 from idp_common.repositories.job_repository import JobRepository
-from app.schemas.jobs import JobResponse
+
 
 router = APIRouter()
 
 
 @router.get("/status/{job_id}", response_model=JobResponse)
-def get_status(job_id: str, db=Depends(get_db)):
+def get_status(
+    job_id: str,
+    db=Depends(get_db),
+    _user=Depends(get_current_user),
+):
 
     repo = JobRepository(db)
 

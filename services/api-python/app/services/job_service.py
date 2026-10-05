@@ -6,10 +6,11 @@ class JobService:
     def __init__(self, job_repo: JobRepository):
         self.job_repo = job_repo
 
-    def create_job(self, request_id: str):
+    def create_job(self, request_id: str, commit: bool = True):
         return self.job_repo.create(
             request_id=request_id,
-            status="PENDING"
+            status="PENDING",
+            commit=commit,
         )
 
     def mark_running(self, job_id: str):

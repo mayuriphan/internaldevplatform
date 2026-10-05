@@ -1,47 +1,45 @@
-import boto3
+import logging
+import signal
+import sys
 
-from jobs.executor import JobExecutor
+from idp_common.messages.sqs_client import SQSClient
 from worker.provision_worker import ProvisionWorker
 
-from idp_common.db.database import db_manager
-from idp_common.messages.sqs_client import SQSClient
-from idp_common.providers.factory import ProviderFactory
-from idp_common.repositories.job_repository import JobRepository
-from idp_common.repositories.service_repository import ServiceRepository
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(name)s %(levelname)s %(message)s",
+)
+
+logger = logging.getLogger("idp.worker.main")
+
+_running = True
+
+
+def _handle_shutdown(signum, frame):
+    global _running
+    logger.info("shutdown_signal_received", extra={"signal": signum})
+    _running = False
 
 
 def run_worker():
 
-    print("Worker started...")
+    signal.signal(signal.SIGTERM, _handle_shutdown)
+    signal.signal(signal.SIGINT, _handle_shutdown)
 
-    # Database
-    db = db_manager.SessionLocal()
+    logger.info("worker_started")
 
-    # Repository
-    job_repo = JobRepository(db)
-    service_repo = ServiceRepository(db)
-
-    # Business logic
-    executor = JobExecutor(
-        job_repo=job_repo,
-        service_repo=service_repo,
-        provider_factory=ProviderFactory,
-    )
-
-    # Messaging
     sqs_client = SQSClient()
-
-    # Worker
-    worker = ProvisionWorker(
-        sqs_client=sqs_client,
-        executor=executor,
-    )
+    worker = ProvisionWorker(sqs_client=sqs_client)
 
     try:
-        while True:
+        while _running:
             worker.poll()
+    except Exception:
+        logger.exception("worker_crashed")
+        sys.exit(1)
     finally:
-        db.close()
+        logger.info("worker_stopped")
 
 
 if __name__ == "__main__":

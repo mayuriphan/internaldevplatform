@@ -12,6 +12,7 @@ class JobRepository:
         self,
         request_id: str,
         status: str = "PENDING",
+        commit: bool = True,
     ) -> Job:
 
         job = Job(
@@ -20,8 +21,12 @@ class JobRepository:
         )
 
         self.db.add(job)
-        self.db.commit()
-        self.db.refresh(job)
+
+        if commit:
+            self.db.commit()
+            self.db.refresh(job)
+        else:
+            self.db.flush()
 
         return job
 
