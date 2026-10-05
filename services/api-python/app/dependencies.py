@@ -1,6 +1,5 @@
+from idp_common.db.database import get_db
 from sqlalchemy.orm import Session
-
-from app.db.database import get_db
 
 
 def get_database() -> Session:

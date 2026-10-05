@@ -8,5 +8,7 @@ version = "0.1.0"
 dependencies = [
     "sqlalchemy",
     "psycopg2-binary",
-    "boto3"
+    "boto3",
+    "pydantic-settings",
+    "tenacity",
 ]

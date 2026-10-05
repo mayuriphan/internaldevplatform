@@ -21,3 +21,4 @@ httpx
 
 tenacity
 pybreaker
+PyJWT

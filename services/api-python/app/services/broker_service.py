@@ -1,61 +1,93 @@
 import json
+import logging
 
-from idp_common.providers.factory import ProviderFactory
+from sqlalchemy.orm import Session
+
 from app.services.job_service import JobService
 from app.services.idempotency_service import IdempotencyService
+from idp_common.repositories.outbox_repository import OutboxRepository
 from idp_common.repositories.service_repository import ServiceRepository
+
+
+logger = logging.getLogger("idp.broker")
 
 
 class BrokerService:
 
     def __init__(
         self,
+        db: Session,
         service_repo: ServiceRepository,
         job_service: JobService,
         idempotency_service: IdempotencyService,
-        sqs_client=None,
+        outbox_repo: OutboxRepository,
     ):
+        self.db = db
         self.service_repo = service_repo
         self.job_service = job_service
         self.idempotency = idempotency_service
-        self.sqs = sqs_client
+        self.outbox_repo = outbox_repo
 
     def provision(self, request: dict):
 
-        # 1. Idempotency Key
         key = self.idempotency.generate_key(request)
 
         cached = self.idempotency.get(key)
         if cached:
             return cached
 
-        # 2. Create Service Request
-        service_request = self.service_repo.create(
-            service_type=request["service_type"],
-            provider=request["provider"],
-            payload=json.dumps(request),
-        )
+        if not self.idempotency.try_claim(key):
+            cached = self.idempotency.get(key)
+            if cached:
+                return cached
+            return {
+                "status": "PROCESSING",
+                "detail": "An identical request is already being processed",
+            }
 
-        # 3. Create Job
-        job = self.job_service.create_job(service_request.id)
+        try:
+            service_request = self.service_repo.create(
+                service_type=request["service_type"],
+                provider=request["provider"],
+                payload=json.dumps(request),
+                commit=False,
+            )
 
-        # 4. Send to queue (async execution)
-        message = {
-            "job_id": job.id,
-            "request_id": service_request.id,
-            "request": request,
-        }
+            job = self.job_service.create_job(
+                service_request.id,
+                commit=False,
+            )
 
-        if self.sqs:
-            self.sqs.send(message)
+            message = {
+                "job_id": job.id,
+                "request_id": service_request.id,
+                "request": request,
+            }
 
-        result = {
-            "request_id": service_request.id,
-            "job_id": job.id,
-            "status": "QUEUED",
-        }
+            self.outbox_repo.create(
+                aggregate_type="job",
+                aggregate_id=job.id,
+                payload=json.dumps(message),
+                commit=False,
+            )
 
-        # 5. Store idempotency result
-        self.idempotency.store(key, result)
+            self.db.commit()
 
-        return result
+            result = {
+                "request_id": service_request.id,
+                "job_id": job.id,
+                "status": "QUEUED",
+            }
+
+            self.idempotency.store(key, result)
+            logger.info(
+                "provision_queued",
+                extra={"job_id": job.id, "request_id": service_request.id},
+            )
+
+            return result
+
+        except Exception:
+            self.db.rollback()
+            self.idempotency.release_claim(key)
+            raise

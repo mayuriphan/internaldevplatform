@@ -29,6 +29,21 @@ class Settings(BaseSettings):
 
     RATE_LIMIT_PER_MINUTE: int = 60
 
+    JWT_SECRET: str = os.getenv("JWT_SECRET", "")
+    JWT_ALGORITHM: str = "HS256"
+    JWT_EXPIRE_HOURS: int = int(os.getenv("JWT_EXPIRE_HOURS", "24"))
+    API_USERNAME: str = os.getenv("API_USERNAME", "")
+    API_PASSWORD: str = os.getenv("API_PASSWORD", "")
+
+    OUTBOX_POLL_INTERVAL_SECONDS: float = float(
+        os.getenv("OUTBOX_POLL_INTERVAL_SECONDS", "2.0")
+    )
+    OUTBOX_BATCH_SIZE: int = int(os.getenv("OUTBOX_BATCH_SIZE", "10"))
+    OUTBOX_MAX_RETRIES: int = int(os.getenv("OUTBOX_MAX_RETRIES", "5"))
+
+    WORKER_MAX_RECEIVE_COUNT: int = int(os.getenv("WORKER_MAX_RECEIVE_COUNT", "3"))
+    PROVISION_MAX_RETRIES: int = int(os.getenv("PROVISION_MAX_RETRIES", "3"))
+
     model_config = SettingsConfigDict(
         env_file=".env",
         extra="ignore"
