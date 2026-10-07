@@ -112,7 +112,10 @@ Updates Job Status
 }
 ```
 
+<img width="1234" height="700" alt="image" src="https://github.com/user-attachments/assets/fce16693-405a-4e1d-b086-0e88ecddc960" />
 
+
+---------------------
 ![alt text](image.png)
 
 ![alt text](image-1.png)
